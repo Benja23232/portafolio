@@ -1,0 +1,22 @@
+security:
+    enable_authenticator_manager: true
+
+    # Hash de contraseñas (no se usa si no hay login, pero lo dejamos por compatibilidad)
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # Proveedores de usuarios (podés borrarlo si no vas a usar entidades de usuario)
+    providers:
+        # Ejemplo vacío, sin base de datos ni memoria
+        users_in_memory: { memory: null }
+
+    firewalls:
+        # Firewall para el entorno dev (profiler, assets, etc.)
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Firewall principal, sin login ni autenticadores
+        main:
+            lazy: true
+            security: false

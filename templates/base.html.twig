@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Portafolio Benjamin{% endblock %}</title>
+
+  {% block stylesheets %}
+
+  {% endblock %}
+<style>
+.alert {
+	background: #38F527;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.alert span {
+	color: white;
+}
+
+.alert button {
+	background: none;
+	border: none;
+}
+
+.modal-mensaje {
+	z-index: 1200;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 20px;
+	border-radius: 5px;
+}
+
+/* Estilo para Éxito */
+.modal-mensaje.modal-exito {
+	background-color: #81de81;
+	border: 2px solid #4CAF50;
+}
+
+/* Estilo para Error */
+.modal-mensaje.modal-error {
+	background-color: #f5c6cb;
+	border: 2px solid #dc3545;
+}
+
+.modal-mensaje-texto {
+	font-size: 1.2rem;
+	color: #333;
+}
+
+.modal-mensaje.modal-error .modal-mensaje-texto {
+	color: #721c24;
+}
+
+.barra-superior {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--sombra-suave);
+    z-index: 1000;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--color-borde);
+}
+
+.barra-superior nav {
+    width: 90%;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.barra-superior ul {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    list-style:none;
+}
+
+.barra-superior:hover {
+    border-bottom: solid 1px rgba(226, 232, 240, 0.5);
+}
+
+.barra-superior li a {
+    color: var(--color-texto);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: var(--fuente-titulos);
+    transition: color 0.3s ease;
+    position: relative;
+    padding-bottom: 4px;
+}
+
+.barra-superior li a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--color-secundario);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.3s ease-out;
+}
+
+.barra-superior li a:hover,
+.barra-superior li a:focus {
+    color: var(--color-primario);
+}
+
+.barra-superior li a:hover::after {
+    transform: scaleX(1);
+}
+
+
+
+</style>
+</head>
+<body>
+  <div class="wrapper">
+    <header class="barra-superior">
+      <nav>
+         <ul>
+             <li><a href="{{ path('app_inicio') }}#inicio">🏠 Inicio</a></li>
+            <li><a href="{{ path('app_inicio') }}#proyectos">📁 Proyectos</a></li>
+            <li><a href="{{ path('app_inicio') }}#sobre-mi">👤 Sobre mí</a></li>
+            <li><a href="{{ path('app_inicio') }}#contacto">✉️ Contacto</a></li>
+          </ul>
+      </nav>
+ </header>
+    {% block body %}{% endblock %}
+  </div>
+
+  {% block javascripts %}
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const modal = document.getElementById('modal');
+      const openModal = document.getElementById('openModal');
+      const closeModal = document.getElementById('closeModal');
+      const form = document.getElementById('contactForm');
+      const feedback = document.getElementById('feedbackNombre');
+      const alerta = document.getElementById('alerta');
+
+      if(openModal && modal) {
+        openModal.onclick = () => modal.classList.remove('hidden');
+      }
+      if(closeModal && modal) {
+        closeModal.onclick = () => modal.classList.add('hidden');
+      }
+
+      if(form) {
+        form.onsubmit = (e) => {
+          e.preventDefault();
+          const nombre = document.getElementById('nombre').value;
+          if (nombre.trim().length < 3) {
+            feedback.textContent = 'El nombre debe tener al menos 3 caracteres.';
+          } else {
+            feedback.textContent = '¡Perfecto!';
+            mostrarAlerta('Formulario enviado correctamente');
+          }
+        };
+      }
+
+      function mostrarAlerta(mensaje) {
+        alerta.textContent = mensaje;
+        alerta.classList.remove('hidden');
+        setTimeout(() => alerta.classList.add('hidden'), 3000);
+      }
+    });
+  </script>
+  <div id="flash-container">
+	  {%for label, messages in app.flashes %}
+	    {%for message in messages %}
+		  <div class="alert alert-{{label}}">
+		    <span>{{message}}</span>
+		    <button class="close-btn" arial-label="cerrar">✔</button>
+		  </div>
+		{% endfor %}
+	  {% endfor %}
+	</div>
+	<script>
+	  document.addEventListener('DOMContentLoaded',function(){
+		const closeButtons=document.querySelectorAll('.alert .close-btn');
+		closeButtons.forEach(button=>{
+			button.addEventListener('click',function(){
+				const alert=this.parentElement;
+				alert.style.transition='opacity 0.3s ease';
+				alert.style.opacity='0';
+				setTimeout(()=>{
+				alert.remove();
+				},300);
+			});
+		});
+	  });
+	</script>
+
+	<div id="modal-mensaje" class="modal-mensaje" style="display:none;">
+        <p id="modal-mensaje-texto" class="modal-mensaje-texto"></p>
+        <a id="modal-mensaje-cerrar" class="boton-minimal">Cerrar</a>
+    </div>
+	<script>
+    function mostrar(msg = 'Operación completada', tipo = 'exito'){
+        const modal = document.getElementById('modal-mensaje');
+        const texto = document.getElementById('modal-mensaje-texto');
+        const cerrar = document.getElementById('modal-mensaje-cerrar');
+        modal.classList.remove('modal-exito', 'modal-error');
+        
+        texto.textContent = msg;
+ 
+        if (tipo === 'error'){
+            modal.classList.add('modal-error'); 
+        } else {
+            modal.classList.add('modal-exito'); 
+        }
+
+        modal.style.display = 'block';
+
+        cerrar.onclick = (event)=>{
+            event.preventDefault(); 
+            modal.style.display='none';
+        };
+
+        window.onkeydown=(event)=>{
+            if (event.key==="Escape"){
+                modal.style.display='none';
+            }
+        };
+
+        if (tipo !== 'error') {
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 3000);
+        }
+    }
+</script>
+  {% endblock %}
+</body>
+</html>

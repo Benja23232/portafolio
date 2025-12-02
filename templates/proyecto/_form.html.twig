@@ -1,0 +1,8 @@
+{{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+    {{ form_row(form.titulo) }}
+    {{ form_row(form.descripcion) }}
+    {{ form_row(form.tecnologias) }}
+    {{ form_row(form.enlace) }}
+    {{ form_row(form.imagens) }}  {# este es el input múltiple #}
+    <button class="btn">{{ button_label|default('Guardar') }}</button>
+{{ form_end(form) }}
